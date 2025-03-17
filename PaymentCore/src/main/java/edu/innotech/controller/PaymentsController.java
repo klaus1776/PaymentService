@@ -32,7 +32,6 @@ public class PaymentsController {
     }
 
     @PostMapping(value = "/payment")
-    //@ResponseStatus(HttpStatus.OK)
     public void makePayment(@RequestParam("userId") Long userId, @RequestParam("accNum") String accountNum, @RequestParam("sum") Double summa) {
         paymentService.makePayment(userId, accountNum, summa);
     }

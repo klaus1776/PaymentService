@@ -11,6 +11,7 @@
     <modules>
         <module>PaymentCore</module>
         <module>ProductCore</module>
+        <module>LimitsCore</module>
     </modules>
 
     <properties>

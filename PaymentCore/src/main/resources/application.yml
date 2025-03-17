@@ -9,10 +9,15 @@ spring:
 
 service:
   payment-client-products: "/products-app/v1/api/products/"
+  limit-client-products: "/limits-app/v1/api/payments/"
 
 integration:
   clients:
     payments-properties:
       uri: "http://localhost:8989"
+      connect-timeout: 5s
+      read-timeout: 10s
+    limits-properties:
+      uri: "http://localhost:8181"
       connect-timeout: 5s
       read-timeout: 10s

@@ -7,29 +7,37 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 
 @Configuration
-@EnableConfigurationProperties(PaymentsProperties.class)
+@EnableConfigurationProperties({PaymentsProperties.class, LimitsProperties.class})
 public class PaymentsConfig {
     private final PaymentsProperties paymentsProperties;
+    private final LimitsProperties limitsProperties;
 
-    public PaymentsConfig(PaymentsProperties paymentsProperties) {
+    public PaymentsConfig(PaymentsProperties paymentsProperties, LimitsProperties limitsProperties) {
         this.paymentsProperties = paymentsProperties;
+        this.limitsProperties = limitsProperties;
     }
 
     @Bean
-    public RestTemplate paymentsClient(RestTemplateResponseErrorHandler errorHandler) {
-        RestTemplateProperties properties = paymentsProperties.getPaymentsProperties();
+    public RestTemplate paymentsClient(RestTemplateBuilder builder, RestTemplateResponseErrorHandler errorHandler) {
+        RestTemplateProperties paymentsProp = paymentsProperties.getPaymentsProperties();
 
-        return new RestTemplateBuilder()
-                .rootUri(properties.getUri())
-                .setConnectTimeout(properties.getConnectTimeout())
-                .setReadTimeout(properties.getReadTimeout())
+        return builder//new RestTemplateBuilder()
+                .rootUri(paymentsProp.getUri())
+                .setConnectTimeout(paymentsProp.getConnectTimeout())
+                .setReadTimeout(paymentsProp.getReadTimeout())
                 .errorHandler(errorHandler)
                 .build();
+    }
 
-//                return new RestTemplateBuilder()
-//                .rootUri("http://localhost:8989")
-//                .setConnectTimeout(Duration.ofSeconds(5))
-//                .setReadTimeout(Duration.ofSeconds(5))
-//                .build();
+    @Bean
+    public RestTemplate limitsClient(RestTemplateBuilder builder, RestTemplateResponseErrorHandler errorHandler) {
+        RestTemplateProperties limitsProp = limitsProperties.getLimitsProperties();
+
+        return builder//new RestTemplateBuilder()
+                .rootUri(limitsProp.getUri())
+                .setConnectTimeout(limitsProp.getConnectTimeout())
+                .setReadTimeout(limitsProp.getReadTimeout())
+                .errorHandler(errorHandler)
+                .build();
     }
 }
