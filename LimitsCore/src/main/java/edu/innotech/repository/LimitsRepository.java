@@ -26,6 +26,16 @@ public interface LimitsRepository extends JpaRepository<UsersLimit, Long> {
 
     @Modifying
     @Transactional
+    @Query(value = "update UsersLimit l set l.limitValue = l.limitValue - :dec where l.userId = :userId")
+    void  decreaseLimitValue(@Param("userId") Long userId, @Param("dec") Double decrement);
+
+    @Modifying
+    @Transactional
+    @Query(value = "update UsersLimit l set l.limitValue = l.limitValue + :rec where l.userId = :userId")
+    void  recoveryLimitValue(@Param("userId") Long userId, @Param("rec") Double recovery);
+
+    @Modifying
+    @Transactional
     @Query(value = "update UsersLimit l set l.limitValue = 10000.00 ")
     void setLimitValue();
 }

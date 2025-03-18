@@ -23,4 +23,16 @@ public class LimitsController {
     public void updateLimitValue(@RequestParam("userId") Long userId, @RequestParam("limit") Double limit) {
         limitsService.updateLimitValue(userId, limit);
     }
+
+    // Метод, уменьшающий лимит клиента
+    @PostMapping(value = "/limitdec")
+    public void decreaseLimitValue(@RequestParam("userId") Long userId, @RequestParam("dec") Double decrement) {
+        limitsService.decreaseLimitValue(userId, decrement);
+    }
+
+    // Метод, восстанавливающий лимит клиента
+    @PostMapping(value = "/limitrec")
+    public void recoveryLimitValue(@RequestParam("userId") Long userId, @RequestParam("rec") Double recovery) {
+        limitsService.recoveryLimitValue(userId, recovery);
+    }
 }

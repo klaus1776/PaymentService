@@ -29,6 +29,4 @@ spring:
 
 service:
   limits-client-products: "/limits-app/v1/api/products/"
-  limits-start-date-format: "yyyy/MM/dd"
-  limits-start-date: "2025/03/16"
   limits-value: 10000.00

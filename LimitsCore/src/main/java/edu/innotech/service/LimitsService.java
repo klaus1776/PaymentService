@@ -1,5 +1,6 @@
 package edu.innotech.service;
 
+import edu.innotech.dto.UserLimitMapper;
 import edu.innotech.dto.UsersLimitDto;
 import edu.innotech.entity.UsersLimit;
 import edu.innotech.exceptions.NoDataFoundException;
@@ -8,65 +9,27 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
 @Service
 public class LimitsService {
     private final LimitsRepository limitsRepository;
-    private final String limitsProducts;
-    private final String limitsDateFormat;
-    private final String limitsStartDate;
     private final Double limitsValue;
 
-    // Метод, обновляющий лимиты пользователей в 00:00:00
-    private void updateUserLimits(String dateFormat, String startDate) {
-        Timer timer = new Timer();
-        Calendar calendar = Calendar.getInstance();
-
-        SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
-        try {
-            calendar.setTime(sdf.parse(startDate));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-
-        // Запуск потока обновляющего лимиты пользователей в 00:00:00
-        timer.schedule(new TimerTask() {
-                           @Override
-                           public void run() {
-                               // Обновление лимитов пользователей в 00:00:00
-                               limitsRepository.setLimitValue();
-                           }
-                       }, calendar.getTime(), 24 * 60 * 60 * 1000
-        );
-    }
-
     public LimitsService(LimitsRepository limitsRepository,
-                         //RestTemplate restTemplate,
-                         @Value("${service.limits-client-products}") String limitsProducts,
-                         @Value("${service.limits-start-date-format}") String limitsDateFormat,
-                         @Value("${service.limits-start-date}") String limitsStartDate,
                          @Value("${service.limits-value}") Double limitsValue) {
         this.limitsRepository = limitsRepository;
-        this.limitsProducts = limitsProducts;
-        this.limitsDateFormat = limitsDateFormat;
-        this.limitsStartDate = limitsStartDate;
         this.limitsValue = limitsValue;
-
-        updateUserLimits(limitsDateFormat, limitsStartDate);
     }
 
+    // Метод, обновляющий лимиты пользователей
+    public void setLimitValue() {
+        limitsRepository.setLimitValue();
+    };
+
     public UsersLimitDto findLimitByUserId(Long userId) {
+        UserLimitMapper mapper = new UserLimitMapper();
         UsersLimit usersLimit = limitsRepository.findLimitByUserId(userId).
                 orElseThrow(() -> new NoDataFoundException("Products not found", "NOT_FOUND"));
-        return new UsersLimitDto(usersLimit);
+        return mapper.map(usersLimit, UsersLimitDto.class);
     }
 
     @Transactional
@@ -83,5 +46,15 @@ public class LimitsService {
 
     public void updateLimitValue(Long userId, Double limit) {
         limitsRepository.updateLimitValue(userId, limit);
+    }
+
+    // Метод, уменьшающий лимит клиента
+    public void decreaseLimitValue(Long userId, Double decrement) {
+        limitsRepository.decreaseLimitValue(userId, decrement);
+    }
+
+    // Метод, восстанавливающий лимит клиента
+    public void recoveryLimitValue(Long userId, Double recovery) {
+        limitsRepository.recoveryLimitValue(userId, recovery);
     }
 }
